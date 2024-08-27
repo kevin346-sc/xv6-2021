@@ -7,13 +7,17 @@ void primes(int (*pipeline)[2])
 {
     close((*pipeline)[1]);
     int first_num = 0;
-    read((*pipeline)[0], &first_num, sizeof(int)); // 读取第一个数
+    if (read((*pipeline)[0], &first_num, sizeof(int)) == 0) {
+        close((*pipeline)[0]);
+        exit(0);
+    }
     fprintf(1, "prime %d\n", first_num);
 
     int np_c[2];
     pipe(np_c);
     if(fork() == 0) // child's child
     {
+        close((*pipeline)[0]);
         primes(&np_c);
     }
     else
@@ -28,8 +32,10 @@ void primes(int (*pipeline)[2])
             }
         }
         close(np_c[1]);
+        close((*pipeline)[0]);
         wait(0);
     }
+    exit(0);
 }
 
 int
