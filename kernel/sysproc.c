@@ -95,3 +95,17 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
+// $ trace 32 grep hello README
+// 3: syscall read -> 1023
+// 3: syscall read -> 966
+// 3: syscall read -> 70
+// 3: syscall read -> 0
+uint64
+sys_trace(void)
+{
+  if(argint(0, &(myproc()->trace_mask)) < 0)
+    return -1;
+  return 0;
+}
