@@ -91,7 +91,7 @@ collect_free(uint64* cnt)
   r = kmem.freelist;
   while(r)
   {
-    cnt += PGSIZE;
+    *cnt += PGSIZE;
     r = r->next;
   }
   release(&kmem.lock);
