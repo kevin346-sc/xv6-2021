@@ -93,6 +93,8 @@ int             kill(int);
 struct cpu*     mycpu(void);
 struct cpu*     getmycpu(void);
 struct proc*    myproc();
+void            collect_free(uint64* cnt);
+void            collect_proc_num(uint64 *cnt);
 void            procinit(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
