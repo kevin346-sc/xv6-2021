@@ -82,6 +82,48 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  // pgaccess(buf, 32, &abits)
+  // arguments: buf   -- starting VA of first user page to check
+  //            32    -- number of pages to check
+  //            abits -- bitmask to store results in user address
+  
+
+  uint64 va = 0;
+  if(argaddr(0, &va) < 0)
+    return -1;
+
+  int num_pages;
+  if(argint(1, &num_pages) < 0)
+    return -1;
+  // if(num_pages > MAXSCAN)
+    // return -1;
+
+  uint64 dstva;
+  if(argaddr(2, &dstva) < 0 )
+    return -1;
+
+  pte_t *pte;
+  uint64 buf = 0;
+  pagetable_t pagetable = myproc()->pagetable;
+  for(int i = 0; i < num_pages; i++)
+  {
+    uint64 nva = va + i * PGSIZE;
+    pte = walk(pagetable, nva, 0);
+    // pte = walk(pagetable, (uint64)((char*)va)[i * PGSIZE], 0); // not ok!
+    if(pte == 0)
+      return -1;
+    if((*pte & PTE_V) == 0)
+      return -1;
+    if((*pte & PTE_U) == 0)
+      return -1;
+    if(*pte & PTE_A)
+    {
+      *pte = *pte & ~PTE_A;
+      buf |= (1 << i);
+    }
+  }
+  if(copyout(pagetable, dstva, (char *)&buf, sizeof(buf)) < 0)
+    return -1;
   return 0;
 }
 #endif
