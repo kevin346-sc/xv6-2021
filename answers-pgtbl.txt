@@ -1,0 +1,4 @@
+Which other xv6 system call(s) could be made faster using this shared page? Explain how.
+    使用共享的只读页面，可以优化频繁读取内核数据但不需要改变内核数据的系统调用，用户进程无需进入内核即可以访问这些数据，避免了不必要的内核切换
+Explain the output of vmprint in terms of Fig 3-4 from the text. What does page 0 contain? What is in page 2? When running in user mode, could the process read/write the memory mapped by page 1? What does the third to last page contain?
+    页0最终映射到0x87f6b000、0x87f68000 和 0x87f67000， 页 2 映射到物理页 0x87f67000， 页1的PTE_U表示不可读，倒数第三页映射到物理页 0x87f76000，它可能包含进程的栈、堆或代码段的数据
