@@ -1,0 +1,41 @@
+Which registers contain arguments to functions? For example, which register holds 13 in main's call to printf?
+    in main's call, a2 holds 13
+Where is the call to function f in the assembly code for main? Where is the call to g? (Hint: the compiler may inline functions.)
+    li a1, 12 --- main calculate result and strore in a1
+At what address is the function printf located?
+    imm[31:12]   rd[11:7]  opcode[6:0]
+      20bits      5bits      7bits
+    30:  00000097           auipc ra,0x0
+    pc = 30， 0x97 = 00...0 1001 0111B, imm = 0, rd = 00001(寄存器代码), opcode = 0010111(操作码)
+    这行代码执行，将0x0左移12位，加到pc(0x30)，结果（0x30）存在ra中
+
+    imm[31:20]   rs1[19:15]   funct3[14:12]   rd[11:7]  opcode[6:0]
+      12bits       5bits         3bits          5bits     7bits
+    34: 600080e7       jalr  1536(ra) # 630 <printf>
+    600080e7H = 0110 0...0 1000 0000 1110 0111B, imm=0110 0000 0000，rs1=00001，funct3=000，rd=00001，opcode=1100111
+    rs1和rd都是00001，对应寄存器ra，ra + imm = 0x30 + 0x600 = 0x630，即为printf地址
+    执行代码后，ra保存pc + 4 = 0x34 + 0x4 = 0x38 
+
+    28:  00000517           auipc a0,0x0
+    // 将pc的高20位传入a0，pc为0x28， a0 = 0x0
+    2c:  7a850513           addi a0,a0,1960 # 7d0 <malloc+0xea>
+    // 将1960加到a0
+    30:  00000097           auipc ra,0x0
+    // 
+    34:  5f8080e7           jalr 1528(ra) # 628 <printf>
+    // 跳转到ra + 1528，即prinf地址
+What value is in the register ra just after the jalr to printf in main?
+    0x38
+Run the following code.
+	unsigned int i = 0x00646c72;
+	printf("H%x Wo%s", 57616, &i);
+      
+What is the output? Here's an ASCII table that maps bytes to characters.
+The output depends on that fact that the RISC-V is little-endian. If the RISC-V were instead big-endian what would you set i to in order to yield the same output? Would you need to change 57616 to a different value?
+    Output is "HE110 World", Hex of 57616 is "e110", and 0x72, 0x6c, 0x64 is the ASCII of r, l, d
+    if big-endian, reverse to 0x726c6400, no need to change 57616.
+
+In the following code, what is going to be printed after 'y='? (note: the answer is not a specific value.) Why does this happen?
+
+	printf("x=%d y=%d", 3);
+    y 未定义
