@@ -78,7 +78,18 @@ usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if(which_dev == 2)
+  {
+    p->ticks++;
+    if(p->ticks == p->interval && p->timer_outstanding)
+    {
+      p->timer_outstanding = 0;
+      p->ticks = 0;
+      p->prev = *(p->trapframe);
+      // 不用直接调用handler，而是将pc指向handler
+      p->trapframe->epc = p->handler;
+    }
     yield();
+  }
 
   usertrapret();
 }
